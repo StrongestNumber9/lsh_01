@@ -241,8 +241,7 @@
             <exclude>rpm/pom.xml</exclude>
             <exclude>rpm/src/main/resources/*</exclude>
             <!-- docker -->
-            <exclude>Dockerfile</exclude>
-            <exclude>docker-entrypoint.sh</exclude>
+            <exclude>docker/**</exclude>
             <!-- resources -->
             <exclude>etc/config.properties</exclude>
             <exclude>src/main/assembly/jar-with-dependencies.xml</exclude>

@@ -67,6 +67,7 @@ public class RegexSplittingTest {
         System.clearProperty("properties.file");
         this.relpServer.tearDown();
         program.interrupt();
+        Assertions.assertDoesNotThrow(() -> program.join());
     }
 
     @Test
