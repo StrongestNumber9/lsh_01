@@ -71,6 +71,7 @@ public class EndToEndTest {
         System.clearProperty("relp.port");
         relpServer.tearDown();
         program.interrupt();
+        Assertions.assertDoesNotThrow(() -> program.join());
     }
 
     @Test
