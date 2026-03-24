@@ -19,34 +19,34 @@ Currently supported configurations:
 [%header,format=csv]
 |===
 Property,Default Value,Notes
-server.listenAddress,127.0.0.1,Address the server will listen to
-server.listenPort,8080,Port the server will listen to
-server.threads,1,How many threads the server will use
-server.maxPendingRequests,128,How many pending requests are allowed
-server.maxContentLength,262144,How big requests are allowed in bytes
-relp.target,127.0.0.1,RELP server address
-relp.port,601,RELP server port
-relp.reconnectInterval,10000,How long to wait before reconnecting in milliseconds
-relp.rebindRequestAmount, 1000000, How many requests from a RELP connection until rebinding it
-relp.rebindEnabled, false, Sets whether rebinding RELP connections is enabled
-healthcheck.enabled,true,Sets if an internal healthcheck endpoint is enabled.
-healthcheck.url,/healthcheck,An internal healthcheck endpoint that will always reply 200 ok regardless of security settings. Accessing this url won't generate any events.
-security.authRequired,true,Sets whether Basic HTTP Authorization headers are required. Username for lookups will be empty string '' if set to false.
-credentials.file,etc/credentials.json,A json file with array of identity:credential mappings
-lookups.hostname.file,etc/hostname.json,Path to username-to-hostname lookup table
-lookups.appname.file,etc/appname.json,Path to username-to-appname lookup table
-payload.splitType, none, Sets how to split incoming messages. Supported split types are 'regex' and 'json_array'. Use 'none' for no splitting.
-payload.splitType.regex.pattern, \n (newline), A regex based on which incoming requests will be split into multiple outgoing messages
-prometheus.port, 1234, Port used by the server that provides DropWizard metrics
+`server.listenAddress`,`127.0.0.1`,Address the server will listen to
+`server.listenPort`,`8080`,Port the server will listen to
+`server.threads`,`1`,How many threads the server will use
+`server.maxPendingRequests`,`128`,How many pending requests are allowed
+`server.maxContentLength`,`262144`,How big requests are allowed in bytes
+`relp.target`,`127.0.0.1`,RELP server address
+`relp.port`,`601`,RELP server port
+`relp.reconnectInterval`,`10000`,How long to wait before reconnecting in milliseconds
+`relp.rebindRequestAmount`,`1000000`, How many requests from a RELP connection until rebinding it
+`relp.rebindEnabled`,`false`, Sets whether rebinding RELP connections is enabled
+`healthcheck.enabled`,`true`,Sets if an internal healthcheck endpoint is enabled.
+`healthcheck.url`,`/healthcheck`,An internal healthcheck endpoint that will always reply 200 ok regardless of security settings. Accessing this url won't generate any events.
+`security.authRequired`,`true`,Sets whether Basic HTTP Authorization headers are required. Username for lookups will be empty string `''` if set to false.
+`credentials.file`,`etc/credentials.json`,A json file with array of identity:credential mappings
+`lookups.hostname.file`,`etc/hostname.json`,Path to username-to-hostname lookup table
+`lookups.appname.file`,`etc/appname.json`,Path to username-to-appname lookup table
+`payload.splitType`,`none`, Sets how to split incoming messages. Supported split types are `regex` and `json_array`. Use `none` for no splitting.
+`payload.splitType.regex.pattern`,`\n` (newline), A regex based on which incoming requests will be split into multiple outgoing messages
+`prometheus.port`,`1234`, Port used by the server that provides DropWizard metrics
 |===
 
 === Lookup tables
 
 By default, the appname and hostname lookup tables are expected to be in `etc/appname.json` and `etc/hostname.json` respectively.
 
-Empty string '' will be used for looking up values when authentication is not required, otherwise it will use one extracted from Authorization header.
+Empty string `''` will be used for looking up values when authentication is not required, otherwise it will use one extracted from Authorization header.
 
-The index is the username and value is what it should map the values to. The value of 'nomatch' will be used if lookup fails.
+The index is the username and value is what it should map the values to. The value of `nomatch` will be used if lookup fails.
 
 == Limitations
 
@@ -99,10 +99,30 @@ java -Dproperties.file=etc/config.properties -Dcredentials.file=etc/credentials.
 
 A RELP-server has to be in place. A server and documentation for setting it up can be found in https://github.com/teragrep/rlp_07[rlp_07]. Make sure that you set `relp.port` in `configuration.properties` to the same port that you are using with the RELP-server.
 
-Example for sending messages from command line:
+You can find all of the configured `username:password` credentials with the following command:
 
+.Show all `username:password` combinations from `credentials.json`
 ----
-curl localhost:8080 -d "foo foo"
+jq --raw-output '.[] | .identity+":"+.credential' etc/credentials.json
+----
+
+Example for sending messages from command line when using example configurations where `security.authRequired` is set to `true`:
+
+.Example with Authorization header dynamically calculating base64 encoded example credentials
+----
+curl localhost:8080 --header "Authorization: Basic $(echo -n ExampleUser:ExamplePassword | base64)" --data "Example Message"
+----
+
+.Example with Authorization header using pre-calcucated base64 encoded example credentials
+----
+curl localhost:8080 --header "Authorization: Basic RXhhbXBsZVVzZXI6RXhhbXBsZVBhc3N3b3Jk" --data "Example Message"
+----
+
+The `Authorization` header can be omitted when `security.authRequired` is set to `false`:
+
+.Example without an Authorization header
+----
+curl localhost:8080 --data "Example Message"
 ----
 
 == Contributing
